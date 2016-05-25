@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "593116128569",
+    "firebase_url": "https://senseapi.firebaseio.com",
+    "project_id": "senseapi",
+    "storage_bucket": "senseapi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:593116128569:android:081996212d6be0dc",
+        "android_client_info": {
+          "package_name": "br.com.vsgdev.firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "593116128569-kosjemvpk5oo712p7om0oklj9lfth6c7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6-vF00G8hGmjuCMcg8wI92TTYlOi1ebk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
