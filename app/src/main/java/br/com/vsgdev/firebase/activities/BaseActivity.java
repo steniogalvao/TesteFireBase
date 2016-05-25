@@ -1,7 +1,11 @@
 package br.com.vsgdev.firebase.activities;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 import br.com.vsgdev.firebase.R;
 
@@ -29,6 +33,13 @@ public class BaseActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         hideProgressDialog();
+    }
+
+    public void signOut() {
+        FirebaseAuth.getInstance().signOut();
+        Intent login = new Intent(this, LoginActivity.class);
+        startActivity(login);
+        finish();
     }
 
 }

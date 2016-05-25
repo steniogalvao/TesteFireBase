@@ -23,6 +23,7 @@
 
     <include layout="@layout/content_main" />
 
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -30,5 +31,14 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_input_add" />
+
+
+    <Button
+        android:id="@+id/btn_logout_activity_main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="250dp"
+        android:text="@string/logout" />
+
 
 </android.support.design.widget.CoordinatorLayout>

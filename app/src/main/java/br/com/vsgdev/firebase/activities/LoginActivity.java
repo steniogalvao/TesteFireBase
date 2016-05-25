@@ -1,11 +1,6 @@
 package br.com.vsgdev.firebase.activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -34,10 +29,6 @@ import br.com.vsgdev.firebase.R;
 public class LoginActivity extends BaseActivity implements OnClickListener, TextView.OnEditorActionListener {
 
     private static final String TAG = "Login";
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
 
     /**
      * Firebase auth services
@@ -50,8 +41,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
      */
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
     private Button mSigInButton;
 
     @Override
@@ -67,9 +56,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
         mSigInButton = (Button) findViewById(R.id.email_sign_in_button);
         mSigInButton.setOnClickListener(this);
 
-//        mLoginFormView = findViewById(R.id.login_form);
-//        mProgressView = findViewById(R.id.login_progress);
-
         //Auth of firebase
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -79,10 +65,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
                 if (user != null) {
                     // User is signed in
                     Log.d("AUTH", "onAuthStateChanged:signed_in:" + user.getUid());
-                    //ir para outra tela
-                    Intent main = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(main);
-                    finish();
+                    //Ir para main TODO:
+                    goToMain();
                 } else {
                     // User is signed out
                     Log.d("AUTH", "onAuthStateChanged:signed_out");
@@ -147,86 +131,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
         return password.length() > 4;
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
-    }
-
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-            signIn(mEmail, mPassword);
-
-            // TODO: register the new account here.
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -247,7 +151,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
             return;
         }
 
-//        showProgress(true);
         showProgressDialog();
 
         // [START sign_in_with_email]
@@ -268,7 +171,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
                             Toast.makeText(LoginActivity.this, "Logado",
                                     Toast.LENGTH_LONG).show();
                         }
-
                         // [START_EXCLUDE]
                         hideProgressDialog();
                         // [END_EXCLUDE]
@@ -277,15 +179,42 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
         // [END sign_in_with_email]
     }
 
-    private void signOut() {
-        mAuth.signOut();
-        Toast.makeText(LoginActivity.this, "Logout ok",
-                Toast.LENGTH_LONG).show();
+    private void createAccount(String email, String password) {
+        Log.d(TAG, "createAccount:" + email);
+        if (!checkLogin()) {
+            return;
+        }
+        showProgressDialog();
+        // [START create_user_with_email]
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
+
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+                        if (!task.isSuccessful()) {
+                            Log.d(TAG, task.getException().getMessage());
+                            Toast.makeText(getApplicationContext(), "Authentication failed. " + task.getException().getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        // [START_EXCLUDE]
+                        hideProgressDialog();
+                        goToMain();
+                        // [END_EXCLUDE]
+                    }
+                });
+        // [END create_user_with_email]
     }
+
 
     @Override
     public void onClick(View v) {
         if (mSigInButton.isPressed()) {
+            createAccount(mEmailView.getText().toString(), mPasswordView.getText().toString());
             signIn(mEmailView.getText().toString(), mPasswordView.getText().toString());
         }
 
@@ -298,6 +227,12 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
             return true;
         }
         return false;
+    }
+
+    private void goToMain() {
+        Intent main = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(main);
+        finish();
     }
 }
 
