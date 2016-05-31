@@ -56,31 +56,28 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
         mSigInButton = (Button) findViewById(R.id.email_sign_in_button);
         mSigInButton.setOnClickListener(this);
 
-        //Auth of firebase
+        /**
+         * Listener para saber se o usuario está logado ou não quando o status do auth muda
+         * */
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
+
                 if (user != null) {
                     // User is signed in
                     Log.d("AUTH", "onAuthStateChanged:signed_in:" + user.getUid());
-                    //Ir para main TODO:
                     goToMain();
                 } else {
                     // User is signed out
                     Log.d("AUTH", "onAuthStateChanged:signed_out");
-                    //ficar no login
                 }
             }
         };
     }
 
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
+    /*check if the fields are ok*/
     private boolean checkLogin() {
         // Reset errors.
         mEmailView.setError(null);
@@ -121,13 +118,13 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
         }
     }
 
+    /*Check if the email is valid*/
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
         return email.contains("@");
     }
 
+    /*check if the password is valida*/
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
@@ -145,6 +142,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
         }
     }
 
+    /*try to sigin the user*/
     private void signIn(String email, String password) {
         Log.d(this.getClass().getName(), "signIn:" + email);
         if (!checkLogin()) {
@@ -159,7 +157,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
-
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
@@ -179,6 +176,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
         // [END sign_in_with_email]
     }
 
+    /*Create a new user account (email and password pattern)*/
     private void createAccount(String email, String password) {
         Log.d(TAG, "createAccount:" + email);
         if (!checkLogin()) {
@@ -229,6 +227,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener, Text
         return false;
     }
 
+    /*go to main activity*/
     private void goToMain() {
         Intent main = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(main);

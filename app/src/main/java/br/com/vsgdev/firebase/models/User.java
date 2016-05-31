@@ -1,22 +1,32 @@
 package br.com.vsgdev.firebase.models;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by Stênio Galvão on 24/05/16 10:18.
  */
 
+@IgnoreExtraProperties
 public class User {
 
-    private int id;
+    private String key;
     private String email;
-    private int password;
-    private Circle circle;
+    private List<Circle> circles;
 
-    public int getId() {
-        return id;
+    public User() {
+        // Default constructor required for calls to DataSnapshot.getValue(Comment.class)
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public User(String email, List<Circle> circles) {
+
+        this.email = email;
+        this.circles = circles;
     }
 
     public String getEmail() {
@@ -27,19 +37,16 @@ public class User {
         this.email = email;
     }
 
-    public int getPassword() {
-        return password;
+    public List<Circle> getCircles() {
+        return circles;
     }
 
-    public void setPassword(int password) {
-        this.password = password;
-    }
-
-    public Circle getCircle() {
-        return circle;
-    }
-
-    public void setCircle(Circle circle) {
-        this.circle = circle;
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        HashMap<String, Object> mapCircles = new HashMap<>();
+        result.put("email", email);
+        result.put("circles", circles);
+        return result;
     }
 }
